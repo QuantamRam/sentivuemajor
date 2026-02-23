@@ -10,9 +10,9 @@ const links = [
 ];
 
 const authors = [
-  "S. Aravindhan",
-  "M. Priya Dharshini",
-  "R. Karthik Raja",
+  "Dr. V. Suganya",
+  "S. Ram Chandar",
+  "G. Aditya Venkatesh",
 ];
 
 const AppLayout = () => {
