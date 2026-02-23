@@ -5,6 +5,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown, MessageSquare, Gauge } from "lucide-react";
 import { getStats, dataset } from "@/lib/dataset";
+import { SourceBadge, sourceMap } from "@/components/SourceIcons";
 
 const stats = getStats();
 
@@ -40,7 +41,20 @@ const DashboardPage = () => {
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-display font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Sentiment analysis overview from pre-loaded social media dataset</p>
+        <p className="text-muted-foreground mt-1">Sentiment analysis overview from {stats.total} social media entries</p>
+        {/* Source platform badges */}
+        <div className="flex flex-wrap items-center gap-2 mt-4">
+          {Object.keys(sourceMap).map((src) => {
+            const info = sourceMap[src];
+            const Icon = info.icon;
+            return (
+              <div key={src} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${info.bgColor} border border-border/50`}>
+                <Icon className={`w-3.5 h-3.5 ${info.color}`} />
+                <span className={`text-xs font-mono ${info.color}`}>{src}</span>
+              </div>
+            );
+          })}
+        </div>
       </motion.div>
 
       {/* Stat Cards */}
@@ -156,7 +170,10 @@ const DashboardPage = () => {
             <div key={entry.id} className="p-4 flex items-center justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground truncate">{entry.text}</p>
-                <p className="text-xs text-muted-foreground mt-1 font-mono">{entry.source} · {entry.timestamp}</p>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <SourceBadge source={entry.source} />
+                  <span className="text-xs text-muted-foreground font-mono">{entry.timestamp}</span>
+                </div>
               </div>
               <span className={`shrink-0 px-3 py-1 rounded-full text-xs font-mono font-medium ${
                 entry.result.label === "Positive" ? "bg-green-500/10 text-green-400" :
