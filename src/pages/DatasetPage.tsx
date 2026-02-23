@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dataset } from "@/lib/dataset";
 import { Search, Filter, Lock, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { SourceBadge } from "@/components/SourceIcons";
 
 type FilterType = "All" | "Positive" | "Negative" | "Neutral";
 
@@ -212,9 +213,7 @@ const DatasetPage = () => {
                   <td className="p-4 text-xs font-mono text-muted-foreground">{entry.id}</td>
                   <td className="p-4 text-sm text-foreground max-w-md">{entry.text}</td>
                   <td className="p-4">
-                    <span className="px-2 py-1 rounded-md text-xs font-mono bg-secondary/50 text-muted-foreground">
-                      {entry.source}
-                    </span>
+                    <SourceBadge source={entry.source} />
                   </td>
                   <td className="p-4 text-xs font-mono text-muted-foreground">{entry.timestamp}</td>
                   <td className="p-4">
