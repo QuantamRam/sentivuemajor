@@ -8,6 +8,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import AnalyzePage from "@/pages/AnalyzePage";
 import DatasetPage from "@/pages/DatasetPage";
 import FeaturesPage from "@/pages/FeaturesPage";
+import XAnalysisPage from "@/pages/XAnalysisPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/analyze" element={<AnalyzePage />} />
             <Route path="/dataset" element={<DatasetPage />} />
             <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/x-analysis" element={<XAnalysisPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

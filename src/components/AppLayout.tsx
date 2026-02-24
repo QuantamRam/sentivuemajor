@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { BarChart3, MessageSquareText, Database, Menu, X, Sparkles, Rocket } from "lucide-react";
+import { FaXTwitter } from "react-icons/fa6";
 import { AnimatePresence, motion } from "framer-motion";
 
 const links = [
   { to: "/", label: "Dashboard", icon: BarChart3 },
   { to: "/analyze", label: "Analyze", icon: MessageSquareText },
   { to: "/dataset", label: "Dataset", icon: Database },
+  { to: "/x-analysis", label: "X Analysis", icon: FaXTwitter },
   { to: "/features", label: "Features", icon: Rocket },
 ];
 
