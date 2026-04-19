@@ -24,6 +24,22 @@ print("Model loaded successfully!")
 class AnalyzeRequest(BaseModel):
     text: str
 
+def extract_keywords(text: str) -> list:
+    stop_words = {"i","me","my","myself","we","our","ours","ourselves","you","your","yours","yourself","yourselves",
+                  "he","him","his","himself","she","her","hers","herself","it","its","itself","they","them","their",
+                  "theirs","themselves","what","which","who","whom","this","that","these","those","am","is","are",
+                  "was","were","be","been","being","have","has","had","having","do","does","did","doing","a","an",
+                  "the","and","but","if","or","because","as","until","while","of","at","by","for","with","about",
+                  "against","between","into","through","during","before","after","above","below","to","from","up",
+                  "down","in","out","on","off","over","under","again","further","then","once","here","there","when",
+                  "where","why","how","all","any","both","each","few","more","most","other","some","such","no","nor",
+                  "not","only","own","same","so","than","too","very","s","t","can","will","just","don","should","now"}
+    import string
+    words = text.translate(str.maketrans('', '', string.punctuation)).lower().split()
+    keywords = [w for w in words if w not in stop_words and len(w) > 2]
+    # Return unique keywords up to 5
+    return list(dict.fromkeys(keywords))[:5]
+
 @app.post("/analyze")
 async def analyze_text(request: AnalyzeRequest):
     if not request.text.strip():
@@ -51,7 +67,8 @@ async def analyze_text(request: AnalyzeRequest):
             "emotion": top_emotion["label"].capitalize(),
             "emotion_score": float(top_emotion["score"]),
             "label": base_label,
-            "all_emotions": [{ "label": e["label"].capitalize(), "score": float(e["score"]) } for e in emotions]
+            "all_emotions": [{ "label": e["label"].capitalize(), "score": float(e["score"]) } for e in emotions],
+            "keywords": extract_keywords(request.text)
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

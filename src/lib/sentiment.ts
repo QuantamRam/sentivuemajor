@@ -34,6 +34,7 @@ export interface SentimentResult {
   emotionScore?: number;
   allEmotions?: { label: string; score: number }[];
   isAi?: boolean;
+  keywords?: string[];
 }
 
 export function analyzeSentiment(text: string): SentimentResult {
@@ -118,7 +119,8 @@ export async function analyzeSentimentWithAI(text: string): Promise<SentimentRes
       positiveCount: fallback.positiveCount,
       negativeCount: fallback.negativeCount,
       wordCount: fallback.wordCount,
-      isAi: true
+      isAi: true,
+      keywords: data.keywords
     };
   } catch (error) {
     console.error("Failed to connect to Local AI:", error);
