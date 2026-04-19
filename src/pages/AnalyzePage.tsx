@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { analyzeSentiment, type SentimentResult } from "@/lib/sentiment";
-import { Send, RotateCcw, ThumbsUp, ThumbsDown, Minus } from "lucide-react";
+import { analyzeSentiment, analyzeSentimentWithAI, type SentimentResult } from "@/lib/sentiment";
+import { Send, RotateCcw, ThumbsUp, ThumbsDown, Minus, Loader2, Sparkles } from "lucide-react";
 
 const exampleTexts = [
   "I absolutely love this product! Best purchase I've ever made.",
@@ -15,19 +15,24 @@ const AnalyzePage = () => {
   const [text, setText] = useState("");
   const [result, setResult] = useState<SentimentResult | null>(null);
   const [history, setHistory] = useState<{ text: string; result: SentimentResult }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!text.trim()) return;
-    const r = analyzeSentiment(text);
+    setIsLoading(true);
+    const r = await analyzeSentimentWithAI(text);
     setResult(r);
     setHistory((prev) => [{ text: text.trim(), result: r }, ...prev].slice(0, 20));
+    setIsLoading(false);
   };
 
-  const handleExample = (t: string) => {
+  const handleExample = async (t: string) => {
     setText(t);
-    const r = analyzeSentiment(t);
+    setIsLoading(true);
+    const r = await analyzeSentimentWithAI(t);
     setResult(r);
     setHistory((prev) => [{ text: t, result: r }, ...prev].slice(0, 20));
+    setIsLoading(false);
   };
 
   const sentimentIcon = result?.label === "Positive" ? ThumbsUp : result?.label === "Negative" ? ThumbsDown : Minus;
@@ -64,10 +69,11 @@ const AnalyzePage = () => {
           </button>
           <button
             onClick={handleAnalyze}
-            disabled={!text.trim()}
+            disabled={!text.trim() || isLoading}
             className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Send className="w-4 h-4" /> Analyze
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {isLoading ? "Analyzing..." : "Analyze"}
           </button>
         </div>
       </motion.div>
@@ -89,6 +95,19 @@ const AnalyzePage = () => {
                 <p className="text-sm text-muted-foreground">Sentiment Classification</p>
               </div>
             </div>
+            
+            {result.isAi && result.emotion && (
+              <div className="mb-4 p-4 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-between shadow-sm">
+                 <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    <span className="font-medium text-foreground">AI Emotion Detected</span>
+                 </div>
+                 <div className="text-right">
+                    <p className="text-lg font-bold text-primary">{result.emotion}</p>
+                 </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
               <div className="bg-background/50 rounded-lg p-3 text-center">
                 <p className="text-lg font-mono font-bold text-foreground">{(result.score * 100).toFixed(0)}%</p>

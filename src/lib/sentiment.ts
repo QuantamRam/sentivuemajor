@@ -30,6 +30,10 @@ export interface SentimentResult {
   positiveCount: number;
   negativeCount: number;
   wordCount: number;
+  emotion?: string;
+  emotionScore?: number;
+  allEmotions?: { label: string; score: number }[];
+  isAi?: boolean;
 }
 
 export function analyzeSentiment(text: string): SentimentResult {
@@ -79,4 +83,45 @@ export function analyzeSentiment(text: string): SentimentResult {
   else label = "Neutral";
 
   return { label, score: normalizedScore, confidence: Math.round(confidence * 100) / 100, positiveCount, negativeCount, wordCount };
+}
+
+export async function analyzeSentimentWithAI(text: string): Promise<SentimentResult> {
+  const fallback = analyzeSentiment(text);
+  
+  if (text.trim().length === 0) {
+      return fallback;
+  }
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      console.warn("AI Backend not reachable or error, falling back to rule-based.");
+      return fallback;
+    }
+
+    const data = await response.json();
+    
+    // Map the returned data, but keep some of the stats from the fallback 
+    // for UI consistency (like positive/negative word counts).
+    return {
+      label: data.label, // From AI
+      score: data.emotion_score, // Using emotion score as confidence for display
+      confidence: data.emotion_score,
+      emotion: data.emotion,
+      emotionScore: data.emotion_score,
+      allEmotions: data.all_emotions,
+      positiveCount: fallback.positiveCount,
+      negativeCount: fallback.negativeCount,
+      wordCount: fallback.wordCount,
+      isAi: true
+    };
+  } catch (error) {
+    console.error("Failed to connect to Local AI:", error);
+    return fallback;
+  }
 }
