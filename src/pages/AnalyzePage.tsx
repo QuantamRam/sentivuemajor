@@ -1,7 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { analyzeSentiment, analyzeSentimentWithAI, type SentimentResult } from "@/lib/sentiment";
-import { Send, RotateCcw, ThumbsUp, ThumbsDown, Minus, Loader2, Sparkles } from "lucide-react";
+import {
+  analyzeSentimentWithAI,
+  analyzeAdvanced,
+  type SentimentResult,
+  type AdvancedAnalytics,
+} from "@/lib/sentiment";
+import {
+  Send, RotateCcw, ThumbsUp, ThumbsDown, Minus, Loader2, Sparkles,
+  Activity, Brain, Gauge, Lightbulb, BarChart3,
+} from "lucide-react";
+import {
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+  BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip,
+  RadialBarChart, RadialBar,
+} from "recharts";
 
 const exampleTexts = [
   "I absolutely love this product! Best purchase I've ever made.",
@@ -13,27 +26,29 @@ const exampleTexts = [
 
 const AnalyzePage = () => {
   const [text, setText] = useState("");
+  const [analyzedText, setAnalyzedText] = useState("");
   const [result, setResult] = useState<SentimentResult | null>(null);
   const [history, setHistory] = useState<{ text: string; result: SentimentResult }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAnalyze = async () => {
-    if (!text.trim()) return;
+  const advanced: AdvancedAnalytics | null = useMemo(
+    () => (result && analyzedText ? analyzeAdvanced(analyzedText, result) : null),
+    [result, analyzedText]
+  );
+
+  const runAnalyze = async (input: string) => {
+    const trimmed = input.trim();
+    if (!trimmed) return;
     setIsLoading(true);
-    const r = await analyzeSentimentWithAI(text);
+    const r = await analyzeSentimentWithAI(trimmed);
     setResult(r);
-    setHistory((prev) => [{ text: text.trim(), result: r }, ...prev].slice(0, 20));
+    setAnalyzedText(trimmed);
+    setHistory((prev) => [{ text: trimmed, result: r }, ...prev].slice(0, 20));
     setIsLoading(false);
   };
 
-  const handleExample = async (t: string) => {
-    setText(t);
-    setIsLoading(true);
-    const r = await analyzeSentimentWithAI(t);
-    setResult(r);
-    setHistory((prev) => [{ text: t, result: r }, ...prev].slice(0, 20));
-    setIsLoading(false);
-  };
+  const handleAnalyze = () => runAnalyze(text);
+  const handleExample = (t: string) => { setText(t); runAnalyze(t); };
 
   const sentimentIcon = result?.label === "Positive" ? ThumbsUp : result?.label === "Negative" ? ThumbsDown : Minus;
   const sentimentColor = result?.label === "Positive" ? "text-green-400" : result?.label === "Negative" ? "text-red-400" : "text-muted-foreground";
@@ -62,7 +77,7 @@ const AnalyzePage = () => {
         />
         <div className="flex items-center justify-between mt-4">
           <button
-            onClick={() => { setText(""); setResult(null); }}
+            onClick={() => { setText(""); setResult(null); setAnalyzedText(""); }}
             className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary/50"
           >
             <RotateCcw className="w-4 h-4" /> Clear
@@ -124,6 +139,140 @@ const AnalyzePage = () => {
               <div className="bg-background/50 rounded-lg p-3 text-center">
                 <p className="text-lg font-mono font-bold text-red-400">{result.negativeCount}</p>
                 <p className="text-xs text-muted-foreground">Negative Words</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Advanced Analytics */}
+      <AnimatePresence>
+        {advanced && result && (
+          <motion.div
+            key="adv"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="space-y-6"
+          >
+            {/* Mood + recommendation */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)]">
+                <div className="flex items-start gap-4">
+                  <div className="text-5xl leading-none">{advanced.moodEmoji}</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
+                      <Brain className="w-3.5 h-3.5" /> Detected Mood
+                    </div>
+                    <h3 className="text-2xl font-display font-bold text-foreground mt-1">{advanced.mood}</h3>
+                    <p className="text-sm text-muted-foreground mt-2">{advanced.emotionalState}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)]">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                  <Lightbulb className="w-3.5 h-3.5" /> Suggested Action
+                </div>
+                <p className="text-sm text-foreground leading-relaxed">{advanced.recommendation}</p>
+              </div>
+            </div>
+
+            {/* Gauges */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <MetricGauge label="Polarity" value={advanced.polarity} min={-100} max={100} icon={<Activity className="w-4 h-4" />} colorVar="--primary" />
+              <MetricGauge label="Energy" value={advanced.energy} min={0} max={100} icon={<Gauge className="w-4 h-4" />} colorVar="--primary" />
+              <MetricGauge label="Subjectivity" value={advanced.subjectivity} min={0} max={100} icon={<BarChart3 className="w-4 h-4" />} colorVar="--primary" />
+            </div>
+
+            {/* Charts */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)]">
+                <h4 className="text-sm font-medium text-foreground mb-1">Emotion Profile</h4>
+                <p className="text-xs text-muted-foreground mb-4">Six-axis mapping of detected emotions</p>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={Object.entries(advanced.emotions).map(([k, v]) => ({ emotion: k.charAt(0).toUpperCase() + k.slice(1), value: v }))}>
+                      <PolarGrid stroke="hsl(var(--border))" />
+                      <PolarAngleAxis dataKey="emotion" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
+                      <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
+                      <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.35} />
+                      <Tooltip contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)]">
+                <h4 className="text-sm font-medium text-foreground mb-1">Top Influential Words</h4>
+                <p className="text-xs text-muted-foreground mb-4">Words contributing most to the score</p>
+                <div className="h-64">
+                  {advanced.topWords.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-sm text-muted-foreground">No strong signal words detected</div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={advanced.topWords} layout="vertical" margin={{ left: 8, right: 16 }}>
+                        <XAxis type="number" hide />
+                        <YAxis type="category" dataKey="word" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={80} />
+                        <Tooltip contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                        <Bar dataKey="weight" radius={[0, 6, 6, 0]}>
+                          {advanced.topWords.map((w, i) => (
+                            <cell key={i} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {advanced.topWords.map((w) => (
+                    <span
+                      key={w.word}
+                      className={`text-xs px-2 py-1 rounded-md font-mono ${
+                        w.type === "positive"
+                          ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                          : "bg-red-500/10 text-red-400 border border-red-500/20"
+                      }`}
+                    >
+                      {w.word}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Word-level highlight + readability */}
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)]">
+                <h4 className="text-sm font-medium text-foreground mb-3">Token-Level Breakdown</h4>
+                <div className="flex flex-wrap gap-1.5 leading-relaxed">
+                  {advanced.highlights.map((h, i) => (
+                    <span
+                      key={i}
+                      className={`text-sm px-1.5 py-0.5 rounded ${
+                        h.type === "positive" ? "bg-green-500/15 text-green-400" :
+                        h.type === "negative" ? "bg-red-500/15 text-red-400" :
+                        h.type === "negator" ? "bg-yellow-500/15 text-yellow-400" :
+                        h.type === "intensifier" ? "bg-primary/15 text-primary" :
+                        "text-muted-foreground"
+                      }`}
+                    >
+                      {h.token}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-3 mt-4 text-xs text-muted-foreground">
+                  <LegendDot color="bg-green-500/40" label="positive" />
+                  <LegendDot color="bg-red-500/40" label="negative" />
+                  <LegendDot color="bg-yellow-500/40" label="negator" />
+                  <LegendDot color="bg-primary/40" label="intensifier" />
+                </div>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-6 shadow-[var(--shadow-card)] space-y-3">
+                <h4 className="text-sm font-medium text-foreground">Linguistics</h4>
+                <Stat label="Sentences" value={advanced.readability.sentences.toString()} />
+                <Stat label="Avg word length" value={`${advanced.readability.avgWordLength}`} />
+                <Stat label="Lexical diversity" value={`${advanced.readability.uniqueRatio}%`} />
+                <Stat label="Total words" value={result.wordCount.toString()} />
               </div>
             </div>
           </motion.div>
