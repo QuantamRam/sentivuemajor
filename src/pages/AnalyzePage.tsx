@@ -13,7 +13,7 @@ import {
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip,
-  RadialBarChart, RadialBar,
+  Cell,
 } from "recharts";
 
 const exampleTexts = [
@@ -216,7 +216,7 @@ const AnalyzePage = () => {
                         <Tooltip contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
                         <Bar dataKey="weight" radius={[0, 6, 6, 0]}>
                           {advanced.topWords.map((w, i) => (
-                            <cell key={i} />
+                            <Cell key={i} fill={w.type === "positive" ? "hsl(142 71% 45%)" : "hsl(0 72% 51%)"} />
                           ))}
                         </Bar>
                       </BarChart>
