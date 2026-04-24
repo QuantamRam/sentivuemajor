@@ -320,3 +320,49 @@ const AnalyzePage = () => {
 };
 
 export default AnalyzePage;
+
+// ─── Helper presentational components ─────────────────────────────────
+
+function MetricGauge({
+  label, value, min, max, icon,
+}: { label: string; value: number; min: number; max: number; icon: React.ReactNode; colorVar?: string }) {
+  const pct = ((value - min) / (max - min)) * 100;
+  const isBipolar = min < 0;
+  const barColor =
+    isBipolar
+      ? value > 5 ? "bg-green-500" : value < -5 ? "bg-red-500" : "bg-muted-foreground"
+      : "bg-primary";
+  return (
+    <div className="bg-card border border-border rounded-xl p-5 shadow-[var(--shadow-card)]">
+      <div className="flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wider">
+        <span className="flex items-center gap-1.5">{icon}{label}</span>
+        <span className="font-mono text-foreground text-base font-semibold">{value}{isBipolar ? "" : "%"}</span>
+      </div>
+      <div className="mt-3 h-2 bg-secondary/60 rounded-full overflow-hidden relative">
+        {isBipolar && <div className="absolute top-0 bottom-0 left-1/2 w-px bg-border" />}
+        <div
+          className={`h-full ${barColor} transition-all duration-500`}
+          style={{ width: `${Math.max(2, Math.min(100, pct))}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function LegendDot({ color, label }: { color: string; label: string }) {
+  return (
+    <span className="flex items-center gap-1.5">
+      <span className={`w-2.5 h-2.5 rounded-sm ${color}`} />
+      {label}
+    </span>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between text-sm border-b border-border/50 pb-2 last:border-0">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-mono font-medium text-foreground">{value}</span>
+    </div>
+  );
+}
