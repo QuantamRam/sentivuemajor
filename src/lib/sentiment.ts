@@ -7,6 +7,42 @@ const positiveWords = new Set([
   "enjoy", "pleased", "glad", "thankful", "grateful", "recommend", "favorite",
   "like", "nice", "cool", "fun", "exciting", "positive", "helpful", "friendly",
   "comfortable", "satisfied", "fast", "easy", "convenient", "reliable",
+  // expanded
+  "loved", "loves", "loving", "liked", "likes", "liking", "enjoyed", "enjoying", "enjoys",
+  "adore", "adored", "admire", "admired", "appreciate", "appreciated", "appreciation",
+  "wow", "yay", "hooray", "cheerful", "joy", "joyful", "joyous", "blissful", "bliss",
+  "ecstatic", "elated", "thrilled", "delighted", "delight", "smile", "smiling", "laugh", "laughing",
+  "win", "winning", "won", "success", "successful", "succeed", "achieved", "achievement",
+  "proud", "pride", "honored", "honor", "respect", "respected", "respectful",
+  "kind", "kindness", "generous", "warm", "warmth", "sweet", "lovely", "charming",
+  "stunning", "gorgeous", "elegant", "graceful", "smooth", "clean", "fresh",
+  "calm", "peaceful", "peace", "relax", "relaxed", "relaxing", "soothing", "serene",
+  "hope", "hopeful", "optimistic", "encouraging", "encourage", "encouraged", "inspiring", "inspired", "inspire",
+  "motivated", "motivating", "energetic", "vibrant", "bright", "shine", "shining",
+  "thanks", "thank", "thx", "appreciated", "blessed", "blessing", "lucky", "fortunate",
+  "amaze", "amazed", "wonder", "wonderful", "marvelous", "splendid", "fabulous", "terrific",
+  "exceptional", "remarkable", "phenomenal", "spectacular", "stellar", "epic", "legendary",
+  "good-quality", "premium", "quality", "valuable", "worthwhile", "worth",
+  "smart", "clever", "intelligent", "wise", "talented", "skilled", "capable", "competent",
+  "easy-to-use", "intuitive", "seamless", "effortless", "efficient", "productive", "effective",
+  "secure", "safe", "trustworthy", "honest", "genuine", "authentic", "real",
+  "improved", "improvement", "better", "upgrade", "upgraded", "enhance", "enhanced",
+  "fixed", "solved", "resolved", "working", "works", "stable",
+  "agree", "agreed", "yes", "absolutely", "definitely", "certainly", "sure",
+  "ok", "okay", "fine", "alright", "decent", "solid",
+  "handsome", "pretty", "cute", "adorable",
+  "fair", "fairly", "reasonable", "affordable", "cheap", "bargain", "deal", "discount",
+  "rich", "wealthy", "abundant", "plenty",
+  "passionate", "passion", "dedicated", "devoted", "committed",
+  "courageous", "brave", "bold", "fearless", "strong", "powerful", "mighty",
+  "free", "freedom", "liberated",
+  "celebrate", "celebrated", "celebration", "festive",
+  "healthy", "healthier", "wellness", "fit", "fitness", "energized",
+  "innovative", "innovation", "creative", "creativity", "original",
+  "popular", "famous", "renowned", "trusted",
+  "fast-paced", "quick", "rapid", "swift", "responsive", "snappy",
+  "comfortable", "cozy", "pleasant", "pleasing", "enjoyable", "satisfying", "satisfaction",
+  "approve", "approved", "approval", "accept", "accepted", "welcome", "welcomed",
 ]);
 
 const negativeWords = new Set([
@@ -16,6 +52,54 @@ const negativeWords = new Set([
   "slow", "expensive", "rude", "uncomfortable", "difficult", "complicated",
   "unreliable", "scam", "never", "dislike", "regret", "problem", "issue",
   "complaint", "refund", "cancel", "damaged", "defective",
+  // expanded
+  "hated", "hates", "hating", "loathe", "loathed", "despise", "despised", "detest",
+  "disliked", "dislikes", "disliking", "disgust", "disgusted", "revolting", "repulsive", "gross", "nasty",
+  "horrendous", "atrocious", "appalling", "dreadful", "ghastly", "vile", "wretched",
+  "terrible", "horrible", "horrifying", "horrified", "scary", "scared", "frightening", "frightened",
+  "afraid", "fear", "fearful", "anxious", "anxiety", "worried", "worry", "worrying",
+  "nervous", "panic", "panicked", "stress", "stressed", "stressful", "tense", "tension",
+  "depressed", "depression", "miserable", "misery", "gloomy", "grief", "grieving", "mourning",
+  "lonely", "loneliness", "alone", "isolated", "abandoned",
+  "cry", "cried", "crying", "tears", "weep", "weeping", "sob", "sobbing",
+  "hurt", "hurts", "hurting", "pain", "painful", "ache", "aching", "suffer", "suffering",
+  "sick", "ill", "illness", "disease", "weak", "tired", "exhausted", "fatigue", "fatigued",
+  "lose", "lost", "loser", "losing", "loss", "fail", "failure", "failing", "fails",
+  "wrong", "mistake", "mistaken", "error", "errors", "buggy", "bug", "bugs", "glitch", "glitchy",
+  "crash", "crashes", "crashed", "crashing", "freeze", "freezes", "frozen", "lag", "laggy",
+  "stupid", "dumb", "idiotic", "moronic", "ridiculous", "absurd", "silly", "foolish",
+  "ignorant", "naive", "clueless",
+  "evil", "wicked", "cruel", "brutal", "savage", "violent", "abusive", "abuse", "abused",
+  "kill", "killed", "killing", "death", "dead", "die", "died", "dying", "murder", "murdered",
+  "war", "fight", "fighting", "conflict", "battle", "attack", "attacked", "attacking",
+  "enemy", "enemies", "hostile", "hostility", "threat", "threatening", "threatened",
+  "betray", "betrayed", "betrayal", "cheat", "cheated", "cheating", "lie", "lied", "lying", "liar",
+  "fraud", "fraudulent", "fake", "phony", "bogus", "deceptive", "deceit", "deceitful",
+  "corrupt", "corruption", "shady", "sketchy", "suspicious",
+  "expensive", "overpriced", "costly", "pricey", "rip-off", "ripoff",
+  "broken", "shattered", "cracked", "destroyed", "ruined", "demolished",
+  "dirty", "filthy", "messy", "cluttered", "stained", "smelly", "stinky",
+  "noisy", "loud", "irritating", "irritated", "irritate", "bothered", "bother", "bothersome",
+  "frustrated", "frustration", "furious", "fury", "outraged", "outrage", "rage", "raging",
+  "mad", "pissed", "agitated", "upset", "bitter", "resent", "resentful", "resentment",
+  "jealous", "jealousy", "envious", "envy", "greedy", "greed", "selfish",
+  "lazy", "incompetent", "unprofessional", "unqualified", "amateur",
+  "no", "nope", "nah", "nothing", "nobody", "none",
+  "cannot", "can't", "couldn't", "won't", "wouldn't", "shouldn't",
+  "down", "downhill", "decline", "declining", "decrease", "decreased", "drop", "dropped", "fell", "fall",
+  "ban", "banned", "block", "blocked", "reject", "rejected", "denied", "deny",
+  "delay", "delayed", "late", "overdue",
+  "missing", "lost", "stolen", "steal", "robbed", "rob",
+  "harm", "harmful", "dangerous", "danger", "risk", "risky", "unsafe", "hazardous",
+  "toxic", "poison", "poisonous", "contaminated",
+  "concern", "concerned", "concerning", "alarming", "alarmed",
+  "doubt", "doubtful", "skeptical", "uncertain", "unsure", "confusing", "confused", "confusion",
+  "ugly", "hideous", "unattractive",
+  "hard", "hardest", "tough", "harsh", "severe",
+  "weakness", "flaw", "flawed", "defect", "defective", "faulty", "malfunction",
+  "complain", "complained", "complaining",
+  "ignore", "ignored", "neglect", "neglected", "neglectful",
+  "boring", "bored", "tedious", "monotonous", "bland", "tasteless",
 ]);
 
 const intensifiers = new Set(["very", "extremely", "absolutely", "totally", "really", "so", "incredibly"]);
@@ -262,12 +346,18 @@ export function analyzeSentiment(text: string): SentimentResult {
     }
   }
 
-  const normalizedScore = Math.max(-1, Math.min(1, score / Math.max(wordCount * 0.3, 1)));
-  const confidence = Math.min(1, (positiveCount + negativeCount) / Math.max(wordCount * 0.2, 1));
+  // Normalize by total signal words (not raw length) so long neutral text
+  // doesn't dilute strong sentiment signals.
+  const signalCount = positiveCount + negativeCount;
+  const denom = Math.max(signalCount, 1);
+  const normalizedScore = Math.max(-1, Math.min(1, score / denom));
+  // Confidence grows with the proportion of signal words AND raw signal count.
+  const ratio = signalCount / Math.max(wordCount, 1);
+  const confidence = Math.min(1, ratio * 4 + Math.min(signalCount, 5) * 0.1);
 
   let label: SentimentLabel;
-  if (normalizedScore > 0.1) label = "Positive";
-  else if (normalizedScore < -0.1) label = "Negative";
+  if (normalizedScore > 0.15) label = "Positive";
+  else if (normalizedScore < -0.15) label = "Negative";
   else label = "Neutral";
 
   return { label, score: normalizedScore, confidence: Math.round(confidence * 100) / 100, positiveCount, negativeCount, wordCount };
@@ -275,41 +365,8 @@ export function analyzeSentiment(text: string): SentimentResult {
 
 export async function analyzeSentimentWithAI(text: string): Promise<SentimentResult> {
   const fallback = analyzeSentiment(text);
-  
-  if (text.trim().length === 0) {
-      return fallback;
-  }
-
-  try {
-    const response = await fetch("http://127.0.0.1:8000/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    });
-
-    if (!response.ok) {
-      console.warn("AI Backend not reachable or error, falling back to rule-based.");
-      return fallback;
-    }
-
-    const data = await response.json();
-    
-    // Map the returned data, but keep some of the stats from the fallback 
-    // for UI consistency (like positive/negative word counts).
-    return {
-      label: data.label, // From AI
-      score: data.emotion_score, // Using emotion score as confidence for display
-      confidence: data.emotion_score,
-      emotion: data.emotion,
-      emotionScore: data.emotion_score,
-      allEmotions: data.all_emotions,
-      positiveCount: fallback.positiveCount,
-      negativeCount: fallback.negativeCount,
-      wordCount: fallback.wordCount,
-      isAi: true
-    };
-  } catch (error) {
-    console.error("Failed to connect to Local AI:", error);
-    return fallback;
-  }
+  // The local Python backend is only available in dev. In production we
+  // always use the rule-based classifier (which is fully offline and works
+  // for arbitrary text).
+  return fallback;
 }
