@@ -35,14 +35,27 @@ export interface SentimentResult {
   allEmotions?: { label: string; score: number }[];
   isAi?: boolean;
   keywords?: string[];
+  uniqueWords?: number;
+  readingTime?: number;
+  averageWordLength?: number;
+  complexityScore?: string;
 }
 
 export function analyzeSentiment(text: string): SentimentResult {
   const words = text.toLowerCase().replace(/[^a-z\s']/g, "").split(/\s+/).filter(Boolean);
   const wordCount = words.length;
 
+  const uniqueWords = new Set(words).size;
+  const readingTime = Math.round((wordCount / 200) * 60) || 1; // in seconds
+  const totalChars = words.reduce((acc, word) => acc + word.length, 0);
+  const averageWordLength = wordCount > 0 ? Number((totalChars / wordCount).toFixed(1)) : 0;
+  
+  let complexityScore = "Basic";
+  if (averageWordLength > 6 || (wordCount > 50 && (uniqueWords / wordCount) > 0.8)) complexityScore = "Advanced";
+  else if (averageWordLength > 4.5) complexityScore = "Intermediate";
+
   if (wordCount === 0) {
-    return { label: "Neutral", score: 0, confidence: 0, positiveCount: 0, negativeCount: 0, wordCount: 0 };
+    return { label: "Neutral", score: 0, confidence: 0, positiveCount: 0, negativeCount: 0, wordCount: 0, uniqueWords: 0, readingTime: 0, averageWordLength: 0, complexityScore: "Basic" };
   }
 
   let score = 0;
@@ -83,7 +96,7 @@ export function analyzeSentiment(text: string): SentimentResult {
   else if (normalizedScore < -0.1) label = "Negative";
   else label = "Neutral";
 
-  return { label, score: normalizedScore, confidence: Math.round(confidence * 100) / 100, positiveCount, negativeCount, wordCount };
+  return { label, score: normalizedScore, confidence: Math.round(confidence * 100) / 100, positiveCount, negativeCount, wordCount, uniqueWords, readingTime, averageWordLength, complexityScore };
 }
 
 export async function analyzeSentimentWithAI(text: string): Promise<SentimentResult> {
@@ -119,6 +132,10 @@ export async function analyzeSentimentWithAI(text: string): Promise<SentimentRes
       positiveCount: fallback.positiveCount,
       negativeCount: fallback.negativeCount,
       wordCount: fallback.wordCount,
+      uniqueWords: fallback.uniqueWords,
+      readingTime: fallback.readingTime,
+      averageWordLength: fallback.averageWordLength,
+      complexityScore: fallback.complexityScore,
       isAi: true,
       keywords: data.keywords
     };
