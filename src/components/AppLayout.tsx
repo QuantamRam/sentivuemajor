@@ -3,6 +3,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { BarChart3, MessageSquareText, Database, Menu, X, Sparkles, Rocket } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 import { AnimatePresence, motion } from "framer-motion";
+import ChatbotWidget from "@/components/ChatbotWidget";
 
 const links = [
   { to: "/", label: "Dashboard", icon: BarChart3 },
@@ -136,6 +137,7 @@ const AppLayout = () => {
           </div>
         </div>
       </footer>
+      <ChatbotWidget />
     </div>
   );
 };
