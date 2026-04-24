@@ -356,7 +356,9 @@ export function analyzeSentiment(text: string): SentimentResult {
   const confidence = Math.min(1, ratio * 4 + Math.min(signalCount, 5) * 0.1);
 
   let label: SentimentLabel;
-  if (normalizedScore > 0.15) label = "Positive";
+  if (negativeCount > positiveCount) label = "Negative";
+  else if (positiveCount > negativeCount) label = "Positive";
+  else if (normalizedScore > 0.15) label = "Positive";
   else if (normalizedScore < -0.15) label = "Negative";
   else label = "Neutral";
 
