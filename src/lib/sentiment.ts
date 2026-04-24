@@ -346,12 +346,18 @@ export function analyzeSentiment(text: string): SentimentResult {
     }
   }
 
-  const normalizedScore = Math.max(-1, Math.min(1, score / Math.max(wordCount * 0.3, 1)));
-  const confidence = Math.min(1, (positiveCount + negativeCount) / Math.max(wordCount * 0.2, 1));
+  // Normalize by total signal words (not raw length) so long neutral text
+  // doesn't dilute strong sentiment signals.
+  const signalCount = positiveCount + negativeCount;
+  const denom = Math.max(signalCount, 1);
+  const normalizedScore = Math.max(-1, Math.min(1, score / denom));
+  // Confidence grows with the proportion of signal words AND raw signal count.
+  const ratio = signalCount / Math.max(wordCount, 1);
+  const confidence = Math.min(1, ratio * 4 + Math.min(signalCount, 5) * 0.1);
 
   let label: SentimentLabel;
-  if (normalizedScore > 0.1) label = "Positive";
-  else if (normalizedScore < -0.1) label = "Negative";
+  if (normalizedScore > 0.15) label = "Positive";
+  else if (normalizedScore < -0.15) label = "Negative";
   else label = "Neutral";
 
   return { label, score: normalizedScore, confidence: Math.round(confidence * 100) / 100, positiveCount, negativeCount, wordCount };
@@ -359,41 +365,8 @@ export function analyzeSentiment(text: string): SentimentResult {
 
 export async function analyzeSentimentWithAI(text: string): Promise<SentimentResult> {
   const fallback = analyzeSentiment(text);
-  
-  if (text.trim().length === 0) {
-      return fallback;
-  }
-
-  try {
-    const response = await fetch("http://127.0.0.1:8000/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    });
-
-    if (!response.ok) {
-      console.warn("AI Backend not reachable or error, falling back to rule-based.");
-      return fallback;
-    }
-
-    const data = await response.json();
-    
-    // Map the returned data, but keep some of the stats from the fallback 
-    // for UI consistency (like positive/negative word counts).
-    return {
-      label: data.label, // From AI
-      score: data.emotion_score, // Using emotion score as confidence for display
-      confidence: data.emotion_score,
-      emotion: data.emotion,
-      emotionScore: data.emotion_score,
-      allEmotions: data.all_emotions,
-      positiveCount: fallback.positiveCount,
-      negativeCount: fallback.negativeCount,
-      wordCount: fallback.wordCount,
-      isAi: true
-    };
-  } catch (error) {
-    console.error("Failed to connect to Local AI:", error);
-    return fallback;
-  }
+  // The local Python backend is only available in dev. In production we
+  // always use the rule-based classifier (which is fully offline and works
+  // for arbitrary text).
+  return fallback;
 }
