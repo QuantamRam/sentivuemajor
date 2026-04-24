@@ -36,6 +36,194 @@ export interface SentimentResult {
   isAi?: boolean;
 }
 
+// ─── Advanced analytics ────────────────────────────────────────────────
+
+export type MoodLabel =
+  | "Joyful"
+  | "Content"
+  | "Calm"
+  | "Neutral"
+  | "Tense"
+  | "Frustrated"
+  | "Angry"
+  | "Sad"
+  | "Excited"
+  | "Anxious";
+
+export interface EmotionScores {
+  joy: number;
+  anger: number;
+  sadness: number;
+  fear: number;
+  surprise: number;
+  trust: number;
+}
+
+export interface AdvancedAnalytics {
+  mood: MoodLabel;
+  moodEmoji: string;
+  emotionalState: string;
+  energy: number;        // 0-100, low=calm, high=intense
+  polarity: number;      // -100..100
+  subjectivity: number;  // 0-100
+  emotions: EmotionScores;
+  topWords: { word: string; type: "positive" | "negative"; weight: number }[];
+  highlights: { token: string; type: "positive" | "negative" | "negator" | "intensifier" | "neutral" }[];
+  readability: { sentences: number; avgWordLength: number; uniqueRatio: number };
+  recommendation: string;
+}
+
+const emotionLexicon: Record<keyof EmotionScores, string[]> = {
+  joy: ["love", "happy", "joy", "great", "amazing", "awesome", "excited", "delight", "wonderful", "fantastic", "enjoy", "glad", "pleased", "fun", "smile", "laugh", "best", "brilliant"],
+  anger: ["hate", "angry", "furious", "rage", "annoying", "annoyed", "mad", "irritated", "outraged", "pissed", "frustrating", "frustrated", "rude"],
+  sadness: ["sad", "unhappy", "depressed", "miserable", "cry", "cried", "lonely", "broken", "regret", "disappointing", "disappointed", "sorry", "loss", "hurt"],
+  fear: ["afraid", "scared", "worried", "anxious", "nervous", "terrified", "panic", "fear", "concerned", "uneasy", "dread"],
+  surprise: ["wow", "surprised", "shocked", "unexpected", "incredible", "unbelievable", "astonished", "amazed", "sudden"],
+  trust: ["reliable", "trust", "honest", "safe", "secure", "recommend", "loyal", "dependable", "confident", "support", "helpful", "friendly"],
+};
+
+const moodEmojis: Record<MoodLabel, string> = {
+  Joyful: "😄", Content: "🙂", Calm: "😌", Neutral: "😐",
+  Tense: "😬", Frustrated: "😠", Angry: "😡", Sad: "😢",
+  Excited: "🤩", Anxious: "😰",
+};
+
+function tokenize(text: string): string[] {
+  return text.toLowerCase().replace(/[^a-z\s']/g, "").split(/\s+/).filter(Boolean);
+}
+
+export function analyzeAdvanced(text: string, base: SentimentResult): AdvancedAnalytics {
+  const words = tokenize(text);
+  const sentences = Math.max(1, (text.match(/[.!?]+/g) || []).length);
+  const unique = new Set(words);
+  const avgWordLength = words.length ? words.reduce((s, w) => s + w.length, 0) / words.length : 0;
+
+  // Emotion scoring
+  const emotions: EmotionScores = { joy: 0, anger: 0, sadness: 0, fear: 0, surprise: 0, trust: 0 };
+  const wordWeights = new Map<string, { type: "positive" | "negative"; weight: number }>();
+  const highlights: AdvancedAnalytics["highlights"] = [];
+
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    const prev = i > 0 ? words[i - 1] : "";
+    const negated = negators.has(prev);
+    const intensified = intensifiers.has(prev);
+    const mult = intensified ? 1.6 : 1;
+
+    let matched = false;
+    (Object.keys(emotionLexicon) as (keyof EmotionScores)[]).forEach((emo) => {
+      if (emotionLexicon[emo].includes(w)) {
+        emotions[emo] += mult * (negated ? 0.3 : 1);
+        matched = true;
+      }
+    });
+
+    if (positiveWords.has(w)) {
+      const t = negated ? "negative" : "positive";
+      wordWeights.set(w, { type: t, weight: (wordWeights.get(w)?.weight || 0) + mult });
+      highlights.push({ token: w, type: t });
+      matched = true;
+    } else if (negativeWords.has(w)) {
+      const t = negated ? "positive" : "negative";
+      wordWeights.set(w, { type: t, weight: (wordWeights.get(w)?.weight || 0) + mult });
+      highlights.push({ token: w, type: t });
+      matched = true;
+    } else if (negators.has(w)) {
+      highlights.push({ token: w, type: "negator" });
+      matched = true;
+    } else if (intensifiers.has(w)) {
+      highlights.push({ token: w, type: "intensifier" });
+      matched = true;
+    }
+    if (!matched) highlights.push({ token: w, type: "neutral" });
+  }
+
+  // Normalize emotions to 0..100
+  const maxEmo = Math.max(1, ...Object.values(emotions));
+  const normalized: EmotionScores = {
+    joy: Math.round((emotions.joy / maxEmo) * 100),
+    anger: Math.round((emotions.anger / maxEmo) * 100),
+    sadness: Math.round((emotions.sadness / maxEmo) * 100),
+    fear: Math.round((emotions.fear / maxEmo) * 100),
+    surprise: Math.round((emotions.surprise / maxEmo) * 100),
+    trust: Math.round((emotions.trust / maxEmo) * 100),
+  };
+
+  // Energy = exclamations + caps + intensifiers + total emotion magnitude
+  const exclaims = (text.match(/!/g) || []).length;
+  const capsWords = (text.match(/\b[A-Z]{2,}\b/g) || []).length;
+  const intensCount = words.filter((w) => intensifiers.has(w)).length;
+  const emoSum = Object.values(emotions).reduce((s, v) => s + v, 0);
+  const energy = Math.min(100, Math.round(exclaims * 12 + capsWords * 10 + intensCount * 8 + emoSum * 6));
+
+  const polarity = Math.round(base.score * 100);
+  const subjectivity = Math.min(100, Math.round(((base.positiveCount + base.negativeCount) / Math.max(1, words.length)) * 250));
+
+  // Mood derivation
+  let mood: MoodLabel = "Neutral";
+  const dominant = (Object.entries(normalized) as [keyof EmotionScores, number][])
+    .sort((a, b) => b[1] - a[1])[0];
+  const [domEmo, domVal] = dominant;
+
+  if (domVal < 15 && Math.abs(polarity) < 15) mood = "Neutral";
+  else if (domEmo === "joy") mood = energy > 55 ? "Excited" : polarity > 40 ? "Joyful" : "Content";
+  else if (domEmo === "trust") mood = "Calm";
+  else if (domEmo === "anger") mood = energy > 50 ? "Angry" : "Frustrated";
+  else if (domEmo === "sadness") mood = "Sad";
+  else if (domEmo === "fear") mood = energy > 45 ? "Anxious" : "Tense";
+  else if (domEmo === "surprise") mood = polarity >= 0 ? "Excited" : "Tense";
+
+  // Emotional state sentence
+  const stateMap: Record<MoodLabel, string> = {
+    Joyful: "The writer expresses strong positive emotion and satisfaction.",
+    Content: "A generally pleasant, settled emotional tone.",
+    Calm: "Composed and trusting — measured language with positive undertones.",
+    Neutral: "Balanced and informational — little emotional charge detected.",
+    Tense: "Subtle unease or apprehension is present in the wording.",
+    Frustrated: "Mild irritation or dissatisfaction is evident.",
+    Angry: "Strong negative emotion and high intensity detected.",
+    Sad: "Low mood and disappointment dominate the language.",
+    Excited: "High energy combined with positive arousal.",
+    Anxious: "Worry and elevated arousal — fear-related cues are strong.",
+  };
+
+  const recMap: Record<MoodLabel, string> = {
+    Joyful: "Amplify this — share the experience publicly.",
+    Content: "Good moment to engage further or follow up.",
+    Calm: "Trust signals are high — a great time for outreach.",
+    Neutral: "Consider asking a clarifying question to surface true sentiment.",
+    Tense: "Address concerns proactively before escalation.",
+    Frustrated: "Acknowledge the issue and offer a concrete fix.",
+    Angry: "Prioritize empathetic response and immediate resolution.",
+    Sad: "Respond with empathy and supportive language.",
+    Excited: "Channel the energy into a clear next step or CTA.",
+    Anxious: "Provide reassurance and clear, factual information.",
+  };
+
+  const topWords = Array.from(wordWeights.entries())
+    .map(([word, v]) => ({ word, ...v }))
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 6);
+
+  return {
+    mood,
+    moodEmoji: moodEmojis[mood],
+    emotionalState: stateMap[mood],
+    energy,
+    polarity,
+    subjectivity,
+    emotions: normalized,
+    topWords,
+    highlights,
+    readability: {
+      sentences,
+      avgWordLength: Math.round(avgWordLength * 10) / 10,
+      uniqueRatio: words.length ? Math.round((unique.size / words.length) * 100) : 0,
+    },
+    recommendation: recMap[mood],
+  };
+}
+
 export function analyzeSentiment(text: string): SentimentResult {
   const words = text.toLowerCase().replace(/[^a-z\s']/g, "").split(/\s+/).filter(Boolean);
   const wordCount = words.length;
