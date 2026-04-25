@@ -199,3 +199,163 @@ const FeaturesPage = () => {
 };
 
 export default FeaturesPage;
+
+const EMOTION_META: Record<string, { emoji: string; color: string; label: string }> = {
+  joy: { emoji: "😊", color: "bg-yellow-400", label: "Joy" },
+  anger: { emoji: "😠", color: "bg-red-500", label: "Anger" },
+  sadness: { emoji: "😢", color: "bg-blue-500", label: "Sadness" },
+  fear: { emoji: "😨", color: "bg-purple-500", label: "Fear" },
+  surprise: { emoji: "😲", color: "bg-pink-500", label: "Surprise" },
+  trust: { emoji: "🤝", color: "bg-emerald-500", label: "Trust" },
+};
+
+const SAMPLES = [
+  "I'm absolutely thrilled with the new update — it works beautifully and feels so smooth!",
+  "I'm worried this won't be ready in time. Everything keeps breaking and I'm exhausted.",
+  "The package arrived on time. The product matches the description.",
+];
+
+function EmotionDetectionPanel() {
+  const [text, setText] = useState("");
+
+  const result = useMemo(() => {
+    const trimmed = text.trim();
+    if (!trimmed) return null;
+    const base = analyzeSentiment(trimmed);
+    const adv = analyzeAdvanced(trimmed, base);
+    const sorted = (Object.entries(adv.emotions) as [keyof typeof adv.emotions, number][])
+      .sort((a, b) => b[1] - a[1]);
+    const dominant = sorted[0];
+    return { base, adv, sorted, dominant };
+  }, [text]);
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 }}
+      className="relative bg-card border border-border rounded-2xl p-6 md:p-8 shadow-[var(--shadow-card)] overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-transparent to-amber-500/5 pointer-events-none" />
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-yellow-400" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-display font-semibold text-foreground">Emotion Detection</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  ● Live
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">Paste any text — we'll detect joy, anger, fear, surprise, sadness, and trust.</p>
+            </div>
+          </div>
+
+          <Textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Paste a sentence, review, tweet, or paragraph here…"
+            className="min-h-[180px] bg-background/50 font-sans text-sm"
+          />
+
+          <div className="flex flex-wrap gap-2">
+            <span className="text-xs text-muted-foreground self-center">Try:</span>
+            {SAMPLES.map((s, i) => (
+              <Button
+                key={i}
+                size="sm"
+                variant="outline"
+                className="text-xs h-7"
+                onClick={() => setText(s)}
+              >
+                Sample {i + 1}
+              </Button>
+            ))}
+            {text && (
+              <Button size="sm" variant="ghost" className="text-xs h-7" onClick={() => setText("")}>
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {!result ? (
+            <div className="h-full min-h-[260px] flex flex-col items-center justify-center text-center border border-dashed border-border rounded-xl p-6">
+              <Wand2 className="w-8 h-8 text-muted-foreground mb-3" />
+              <p className="text-sm text-muted-foreground">Your emotion analysis will appear here.</p>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between p-4 rounded-xl bg-background/50 border border-border">
+                <div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-mono">Dominant Emotion</div>
+                  <div className="text-2xl font-display font-bold text-foreground mt-1">
+                    {EMOTION_META[result.dominant[0]]?.label} {EMOTION_META[result.dominant[0]]?.emoji}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-mono">Mood</div>
+                  <div className="text-2xl font-display font-bold text-foreground mt-1">
+                    {result.adv.moodEmoji} <span className="text-base">{result.adv.mood}</span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground italic px-1">
+                "{result.adv.emotionalState}"
+              </p>
+
+              <div className="space-y-2">
+                {result.sorted.map(([emo, val]) => {
+                  const meta = EMOTION_META[emo];
+                  return (
+                    <div key={emo} className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-foreground font-medium">
+                          {meta.emoji} {meta.label}
+                        </span>
+                        <span className="font-mono text-muted-foreground">{val}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-secondary/50 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${val}%` }}
+                          transition={{ duration: 0.6 }}
+                          className={`h-full ${meta.color}`}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                <Stat label="Polarity" value={`${result.adv.polarity > 0 ? "+" : ""}${result.adv.polarity}`} />
+                <Stat label="Energy" value={`${result.adv.energy}`} />
+                <Stat label="Subjectivity" value={`${result.adv.subjectivity}%`} />
+              </div>
+
+              <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-xs text-foreground">
+                <span className="font-semibold text-primary">Insight: </span>
+                {result.adv.recommendation}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="p-2 rounded-lg bg-background/50 border border-border text-center">
+      <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">{label}</div>
+      <div className="text-sm font-display font-bold text-foreground mt-0.5">{value}</div>
+    </div>
+  );
+}
