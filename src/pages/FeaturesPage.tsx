@@ -7,6 +7,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { analyzeSentiment, analyzeAdvanced } from "@/lib/sentiment";
+import {
+  SentimentHeatmapPanel,
+  SarcasmDetectorPanel,
+  ComparativePanel,
+} from "@/components/features/AdvancedFeaturePanels";
 
 const features = [
   {
@@ -61,7 +66,7 @@ const features = [
     icon: BarChart3,
     title: "Advanced Analytics",
     description: "Comprehensive reports with trend forecasting, competitor analysis, and exportable dashboards.",
-    status: "coming-soon" as const,
+    status: "live" as const,
     gradient: "from-indigo-500/20 to-blue-600/20",
     iconColor: "text-indigo-400",
   },
@@ -77,7 +82,7 @@ const features = [
     icon: Fingerprint,
     title: "Entity Recognition",
     description: "Named entity extraction to identify brands, people, and topics driving sentiment.",
-    status: "coming-soon" as const,
+    status: "live" as const,
     gradient: "from-lime-500/20 to-green-600/20",
     iconColor: "text-lime-400",
   },
@@ -165,6 +170,10 @@ const FeaturesPage = () => {
       </div>
 
       <EmotionDetectionPanel />
+
+      <SentimentHeatmapPanel />
+      <SarcasmDetectorPanel />
+      <ComparativePanel />
 
       {/* CTA Section */}
       <motion.div
