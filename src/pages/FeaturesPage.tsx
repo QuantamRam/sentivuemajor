@@ -1,8 +1,12 @@
 import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
 import {
   Globe, Brain, Shield, Zap, BarChart3, Bot,
-  Layers, Workflow, Fingerprint, Sparkles, Lock, Radar,
+  Layers, Workflow, Fingerprint, Sparkles, Lock, Radar, Wand2,
 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { analyzeSentiment, analyzeAdvanced } from "@/lib/sentiment";
 
 const features = [
   {
@@ -81,7 +85,7 @@ const features = [
     icon: Zap,
     title: "Emotion Detection",
     description: "Go beyond positive/negative — detect joy, anger, fear, surprise, and more nuanced emotions.",
-    status: "coming-soon" as const,
+    status: "live" as const,
     gradient: "from-yellow-500/20 to-amber-600/20",
     iconColor: "text-yellow-400",
   },
