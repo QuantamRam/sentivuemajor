@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
 import DashboardPage from "@/pages/DashboardPage";
 import AnalyzePage from "@/pages/AnalyzePage";
-import DatasetPage from "@/pages/DatasetPage";
 import FeaturesPage from "@/pages/FeaturesPage";
 import XAnalysisPage from "@/pages/XAnalysisPage";
 import NotFound from "./pages/NotFound";
@@ -23,7 +22,6 @@ const App = () => (
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/analyze" element={<AnalyzePage />} />
-            <Route path="/dataset" element={<DatasetPage />} />
             <Route path="/features" element={<FeaturesPage />} />
             <Route path="/x-analysis" element={<XAnalysisPage />} />
           </Route>

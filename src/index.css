@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,55 +6,50 @@
 
 @layer base {
   :root {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 92%;
+    /* Premium Dark Mode - Zinc Base */
+    --background: 240 10% 4%; /* #09090b - Zinc 950 */
+    --foreground: 0 0% 98%;
 
-    --card: 222 44% 9%;
-    --card-foreground: 210 40% 92%;
+    --card: 240 10% 4%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222 44% 9%;
-    --popover-foreground: 210 40% 92%;
+    --popover: 240 10% 4%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 187 80% 48%;
-    --primary-foreground: 222 47% 6%;
+    /* Singular Accent: Emerald/Electric Blue (Using a sleek Emerald here) */
+    --primary: 160 84% 39%; /* Emerald 600 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 30% 14%;
-    --secondary-foreground: 210 40% 85%;
+    --secondary: 240 4% 16%; /* Zinc 800 */
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 222 30% 12%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 240 5% 26%; /* Zinc 700 */
+    --muted-foreground: 240 5% 65%; /* Zinc 400 */
 
-    --accent: 187 80% 48%;
-    --accent-foreground: 222 47% 6%;
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive - Rose */
+    --destructive: 349 89% 52%; 
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 222 30% 16%;
-    --input: 222 30% 16%;
-    --ring: 187 80% 48%;
+    --border: 240 4% 16%; /* Zinc 800 */
+    --input: 240 4% 16%;
+    --ring: 160 84% 39%;
 
-    --radius: 0.75rem;
-
-    --sidebar-background: 222 44% 8%;
-    --sidebar-foreground: 210 40% 92%;
-    --sidebar-primary: 187 80% 48%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 222 30% 14%;
-    --sidebar-accent-foreground: 210 40% 92%;
-    --sidebar-border: 222 30% 16%;
-    --sidebar-ring: 187 80% 48%;
+    --radius: 1rem;
 
     /* Custom tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(187 80% 48%), hsl(200 90% 55%));
-    --gradient-hero: linear-gradient(180deg, hsl(222 47% 6%) 0%, hsl(222 50% 10%) 50%, hsl(222 47% 6%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(222 44% 10%), hsl(222 44% 7%));
-    --gradient-accent: linear-gradient(135deg, hsl(187 80% 48% / 0.15), hsl(200 90% 55% / 0.05));
-    --shadow-glow: 0 0 40px hsl(187 80% 48% / 0.15);
-    --shadow-card: 0 4px 24px hsl(222 47% 2% / 0.5);
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'Inter', sans-serif;
+    --shadow-card: 0 20px 40px -15px rgba(0,0,0,0.5);
+    
+    --font-display: 'Outfit', sans-serif;
+    --font-body: 'Outfit', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+
+    /* Emil Kowalski Animation Tokens */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   }
 }
 
@@ -66,67 +61,83 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    /* Subtle Grain/Noise overlay is handled via fixed divs, no heavy gradient backgrounds */
   }
 
-  h1, h2, h3 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    letter-spacing: -0.02em;
   }
 
   code, pre {
     font-family: var(--font-mono);
   }
+
+  /* Emil Kowalski Button Physics */
+  button {
+    transition: transform 160ms var(--ease-out), filter 200ms ease, opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  }
+  
+  button:active {
+    transform: scale(0.97);
+  }
 }
 
-/* Scrollbar */
+/* Scrollbar - Clean & Minimal */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: hsl(var(--muted));
   border-radius: 3px;
 }
-
-/* Glow text */
-.text-glow {
-  text-shadow: 0 0 20px hsl(187 80% 48% / 0.4), 0 0 60px hsl(187 80% 48% / 0.1);
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
 }
 
-/* Grid pattern background */
+/* Liquid Glass Refraction */
+.glass-panel {
+  background: rgba(24, 24, 27, 0.6); /* Zinc 900 / 60% */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Inner refraction */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--shadow-card);
+}
+
+.glass-card {
+  background: rgba(24, 24, 27, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--shadow-card);
+  transition: transform 250ms var(--ease-out), border-color 250ms var(--ease-out), box-shadow 250ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), var(--shadow-card);
+    transform: translateY(-2px);
+  }
+}
+
+/* Background Grid Pattern (Subtle) */
 .bg-grid {
   background-image: 
-    linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
-  background-size: 60px 60px;
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
-/* Section divider */
-.section-glow-line {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.5), transparent);
-}
-
-/* Card hover glow */
-.card-glow:hover {
-  box-shadow: 0 0 30px hsl(var(--primary) / 0.08), 0 4px 24px hsl(222 47% 2% / 0.5);
-}
-
-/* Gradient text */
+/* Utility for text gradients (Used sparingly) */
 .gradient-text {
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, hsl(0 0% 100%), hsl(240 5% 65%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* Animated border gradient */
-@keyframes border-glow {
-  0%, 100% { border-color: hsl(var(--border)); }
-  50% { border-color: hsl(var(--primary) / 0.4); }
-}
-
-.animate-border-glow {
-  animation: border-glow 3s ease-in-out infinite;
 }

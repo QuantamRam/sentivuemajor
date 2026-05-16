@@ -47,7 +47,7 @@ const AIChatBot = () => {
       } else if (lower.includes("sarcasm")) {
         aiResponse = "While pure rule-based algorithms struggle with sarcasm, our AI integration looks at contextual word embeddings. If you use conflicting emotional terms, the Sentiment Journey graph often reflects an erratic swing!";
       } else if (lower.includes("who created")) {
-        aiResponse = "SentiVue is an enterprise-grade IEEE Conference Project meticulously architected by Dr. V. Suganya, S. Ram Chandar, and G. Aditya Venkatesh for their final B.Tech submission!";
+        aiResponse = "SentiVue is an enterprise-grade sentiment analysis engine meticulously architected for real-time production analytics!";
       }
 
       setMessages(prev => [...prev, {
@@ -63,14 +63,14 @@ const AIChatBot = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className="fixed bottom-24 right-6 w-[360px] h-[500px] bg-card border border-border shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden"
+            className="fixed bottom-24 right-6 w-[360px] h-[500px] glass-panel rounded-2xl flex flex-col z-50 overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border bg-secondary/30">
+            <div className="flex items-center justify-between p-4 border-b border-border/50 bg-secondary/20">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center relative">
                   <Bot className="w-5 h-5 text-primary" />
@@ -90,7 +90,7 @@ const AIChatBot = () => {
             </div>
 
             {/* Messages body */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background/50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-transparent">
               {messages.map((msg) => (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -116,7 +116,7 @@ const AIChatBot = () => {
             </div>
 
             {/* Input area */}
-            <div className="p-3 border-t border-border bg-card">
+            <div className="p-3 border-t border-border/50 bg-transparent">
               <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
                 {suggestions.map((s, i) => (
                   <button
@@ -153,8 +153,8 @@ const AIChatBot = () => {
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-2xl flex items-center justify-center z-50 overflow-hidden"
+        whileTap={{ scale: 0.97 }}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-[var(--shadow-glow)] flex items-center justify-center z-50 overflow-hidden animate-pulse-glow"
       >
         <AnimatePresence mode="wait">
           {isOpen ? (

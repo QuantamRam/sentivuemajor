@@ -109,14 +109,14 @@ const FeaturesPage = () => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-3 mb-2">
           <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-            <span className="text-xs font-mono text-primary">Roadmap</span>
+            <span className="text-xs font-mono text-primary">Platform</span>
           </div>
         </div>
         <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
           Advanced Features
         </h1>
         <p className="text-muted-foreground mt-2 max-w-2xl">
-          Powerful capabilities coming soon to SentiVue. Our team is building the next generation of sentiment analysis tools powered by cutting-edge AI and NLP research.
+          Powerful capabilities integrated directly into SentiVue. Our team has built the next generation of sentiment analysis tools powered by cutting-edge AI and NLP.
         </p>
       </motion.div>
 
@@ -138,9 +138,6 @@ const FeaturesPage = () => {
                 <div className={`w-11 h-11 rounded-xl bg-secondary/50 border border-border flex items-center justify-center group-hover:border-primary/20 transition-colors`}>
                   <feature.icon className={`w-5 h-5 ${feature.iconColor}`} />
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 animate-pulse">
-                  Coming Soon
-                </span>
               </div>
 
               <h3 className="text-lg font-display font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
@@ -170,14 +167,14 @@ const FeaturesPage = () => {
             The Future of Sentiment Analysis
           </h2>
           <p className="text-muted-foreground max-w-lg mx-auto mb-6">
-            We're building the most comprehensive sentiment analysis platform. Stay tuned for these powerful features powered by cutting-edge research from our IEEE publication.
+            We're building the most comprehensive sentiment analysis platform. Explore these powerful features powered by cutting-edge research.
           </p>
           <div className="flex items-center justify-center gap-3 flex-wrap">
             <div className="px-5 py-2.5 bg-primary/10 border border-primary/20 rounded-xl text-sm font-mono text-primary">
-              Based on IEEE Research
+              Enterprise Ready
             </div>
             <div className="px-5 py-2.5 bg-secondary/50 border border-border rounded-xl text-sm font-mono text-muted-foreground">
-              Vel Tech University
+              Production Scaled
             </div>
           </div>
         </div>

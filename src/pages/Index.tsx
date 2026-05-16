@@ -22,7 +22,7 @@ const Index = () => {
       <ReferencesSection />
       <footer className="py-8 px-6 border-t border-border text-center">
         <p className="text-sm text-muted-foreground font-mono">
-          © 2025 Vel Tech University · IEEE Conference Paper
+          © 2026 SentiVue · AI Engine
         </p>
       </footer>
     </div>
